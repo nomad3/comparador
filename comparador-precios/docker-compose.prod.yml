@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: comparador_backend_prod
+    # Command for production (no --reload)
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    # No volumes mounted for code in production
+    volumes:
+      # Optional: Mount logs directory if logging to files
+      - backend_logs:/app/logs
+    # No ports exposed directly, Nginx will proxy
+    env_file:
+      # Load production environment variables
+      - ./backend/.env.prod # IMPORTANT: Create this file with production secrets!
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    networks:
+      - comparador_net
+    restart: always # Restart automatically if it fails
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      # Pass production API URL if needed (can be overridden by Nginx proxy)
+      # args:
+      #   VITE_API_BASE_URL: https://yourdomain.com/api/v1 # Example
+    container_name: comparador_frontend_prod
+    # Nginx runs by default based on Dockerfile CMD
+    # No code volumes mounted in production
+    ports:
+      # Expose Nginx port 80 to the host machine (or load balancer)
+      - "80:80"
+      # Optional: Expose 443 if handling SSL within this container (less common)
+      # - "443:443"
+    depends_on:
+      - backend
+    networks:
+      - comparador_net
+    restart: always
+
+  db:
+    image: postgres:15-alpine
+    container_name: comparador_db_prod
+    volumes:
+      # Use named volume for persistent production data
+      - postgres_data_prod:/var/lib/postgresql/data/
+      # DO NOT mount init-db.sql in production unless absolutely intended
+      # Migrations should be handled separately (e.g., Alembic)
+    environment:
+      # Load production credentials from .env file
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    # No ports exposed directly to host in production (unless needed for backups/admin)
+    networks:
+      - comparador_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  cache:
+    image: redis:7-alpine
+    container_name: comparador_cache_prod
+    # No ports exposed directly to host in production
+    networks:
+      - comparador_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+volumes:
+  postgres_data_prod: # Separate volume for production data
+    driver: local
+  backend_logs: # Optional volume for backend logs
+    driver: local
+
+networks:
+  comparador_net:
+    driver: bridge

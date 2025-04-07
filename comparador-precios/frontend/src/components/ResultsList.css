@@ -1,0 +1,28 @@
+.results-list {
+  padding: 0 20px 20px 20px; /* Add padding around the list */
+  max-width: 900px; /* Max width for the results area */
+  margin: 0 auto; /* Center the list */
+}
+
+.results-loading,
+.results-error,
+.results-empty {
+  text-align: center;
+  padding: 40px 20px;
+  font-size: 1.1rem;
+  color: #6c757d; /* Gray text */
+}
+
+.results-error {
+  color: #dc3545; /* Red for errors */
+  font-weight: bold;
+}
+
+/* Optional: Add grid layout for results */
+/*
+.results-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+*/

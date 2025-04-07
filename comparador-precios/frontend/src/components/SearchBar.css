@@ -1,0 +1,63 @@
+.search-bar-container {
+  padding: 20px;
+  background-color: #f8f9fa; /* Light background */
+  border-bottom: 1px solid #dee2e6;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.search-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* Space between elements */
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.search-input {
+  padding: 10px 15px;
+  font-size: 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  min-width: 300px; /* Minimum width */
+  flex-grow: 1; /* Allow input to grow */
+  max-width: 600px; /* Maximum width */
+}
+
+.search-button, .force-search-button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.search-button {
+  background-color: #007bff; /* Primary blue */
+  color: white;
+}
+
+.search-button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.force-search-button {
+  background-color: #6c757d; /* Secondary gray */
+  color: white;
+}
+
+.force-search-button:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+
+.search-button:disabled, .force-search-button:disabled {
+  background-color: #adb5bd;
+  cursor: not-allowed;
+}
+
+.search-message {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #6c757d;
+}

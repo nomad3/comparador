@@ -1,0 +1,116 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile # Uses backend/Dockerfile
+    container_name: comparador_backend_dev
+    # Command for development with hot-reloading
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      # Mount local backend code into the container for development
+      - ./backend:/app
+      # Optional: Mount logs directory if logging to files
+      # - ./backend/logs:/app/logs
+    ports:
+      # Expose backend port to host machine (e.g., for direct API access/testing)
+      - "8000:8000"
+    env_file:
+      # Load environment variables from .env file in backend directory
+      - ./backend/.env
+    depends_on:
+      # Ensure database and cache are healthy before starting backend
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    networks:
+      - comparador_net
+    restart: unless-stopped # Restart if it crashes (useful for dev)
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile # Uses frontend/Dockerfile (multi-stage)
+      # Pass the API URL needed by the React app at build time
+      # For local dev using Nginx proxy, this can be relative
+      # If accessing backend directly (e.g. no Nginx), use http://backend:8000/api/v1
+      args:
+        VITE_API_BASE_URL: /api/v1 # Relative path for Nginx proxy
+    container_name: comparador_frontend_dev
+    # Nginx runs by default based on the frontend Dockerfile CMD
+    volumes:
+      # For development, we mount the source code and run Vite dev server instead of Nginx
+      # Override the default command from the Dockerfile for dev mode
+      - ./frontend:/app
+      # Prevent local node_modules from overwriting container's node_modules
+      - /app/node_modules
+    # Command to run Vite dev server with hot-reloading
+    command: npm run dev -- --host 0.0.0.0 --port 5173 # Use 0.0.0.0 to allow external access
+    ports:
+      # Expose Vite dev server port to host machine
+      - "5173:5173"
+    environment:
+      # Necessary for hot-reloading to work reliably in Docker containers
+      - CHOKIDAR_USEPOLLING=true
+      # VITE_API_BASE_URL for runtime (if needed, though build arg is preferred for static builds)
+      # This is useful if NOT using Nginx proxy in dev
+      # - VITE_API_BASE_URL=http://localhost:8000/api/v1
+    depends_on:
+      - backend # Frontend depends on backend being available
+    networks:
+      - comparador_net
+    restart: unless-stopped
+
+  db:
+    image: postgres:15-alpine # Use a specific version
+    container_name: comparador_db_dev
+    volumes:
+      # Mount named volume for persistent data
+      - postgres_data_dev:/var/lib/postgresql/data/
+      # Mount initialization script (optional, creates tables/sources on first run)
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      # Load credentials from .env file (ensure backend/.env exists)
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      # Expose PostgreSQL port only if you need to connect from host machine (e.g., with pgAdmin)
+      - "5433:5432" # Map to 5433 on host to avoid conflicts
+    networks:
+      - comparador_net
+    healthcheck:
+      # Check if PostgreSQL server is ready to accept connections
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  cache:
+    image: redis:7-alpine # Use a specific version
+    container_name: comparador_cache_dev
+    ports:
+      # Expose Redis port only if you need to connect from host machine
+      - "6379:6379"
+    networks:
+      - comparador_net
+    healthcheck:
+      # Check if Redis server is responding to ping
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+# Define named volumes for data persistence
+volumes:
+  postgres_data_dev:
+    driver: local # Default driver
+
+# Define the network for services to communicate
+networks:
+  comparador_net:
+    driver: bridge # Default bridge network

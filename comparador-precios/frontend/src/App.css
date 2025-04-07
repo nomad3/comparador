@@ -1,0 +1,46 @@
+/* Reset basic styles */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f4f4f4; /* Light gray background for the page */
+  color: #333;
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensure footer stays at bottom */
+}
+
+.App-header {
+  background-color: #282c34; /* Dark header */
+  padding: 15px 20px;
+  color: white;
+  text-align: center;
+}
+
+.App-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+main {
+  flex-grow: 1; /* Allow main content to take available space */
+  /* Padding is handled by components inside */
+}
+
+.App-footer {
+  background-color: #f8f9fa; /* Light footer */
+  padding: 10px 20px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #6c757d;
+  border-top: 1px solid #dee2e6;
+  margin-top: auto; /* Push footer to bottom */
+}
+
+/* Add other global styles if needed */

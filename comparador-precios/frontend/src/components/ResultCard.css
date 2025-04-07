@@ -1,0 +1,79 @@
+.result-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex; /* Use flexbox for layout */
+  flex-direction: column; /* Stack elements vertically by default */
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.result-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Optional: Add layout for image if uncommented in JSX */
+/*
+.result-card {
+  flex-direction: row;
+  gap: 15px;
+}
+.result-image {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  border-radius: 4px;
+  border: 1px solid #eee;
+}
+*/
+
+.result-details {
+  flex-grow: 1; /* Allow details to take remaining space */
+}
+
+.result-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.result-source {
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.result-price {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #007bff; /* Highlight price */
+  margin-bottom: 8px;
+}
+
+.result-scraped-at {
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 15px;
+}
+
+.result-link {
+  display: inline-block;
+  padding: 8px 15px;
+  background-color: #28a745; /* Success green */
+  color: white !important; /* Ensure text is white */
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-align: center;
+  transition: background-color 0.2s ease;
+  align-self: flex-start; /* Align button to the start */
+}
+
+.result-link:hover {
+  background-color: #218838;
+  color: white; /* Ensure text stays white on hover */
+}

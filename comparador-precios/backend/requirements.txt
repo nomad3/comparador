@@ -1,0 +1,11 @@
+fastapi[all]>=0.100.0 # Using [all] includes uvicorn, pydantic, etc.
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.0 # Driver for PostgreSQL
+redis[hiredis]>=5.0.0 # Async redis client with C extension for performance
+httpx[http2]>=0.25.0 # Async HTTP client, http2 extra for potential speedups
+beautifulsoup4>=4.12.0 # HTML parsing
+python-dotenv>=1.0.0 # Loading .env files
+pydantic-settings>=2.0.0 # For settings management
+loguru>=0.7.0 # Better logging
+# Optional: Add alembic if you want DB migrations
+# alembic>=1.10.0
